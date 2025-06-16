@@ -15,7 +15,6 @@ from config import get_config
 from loss import MarginLoss, MutualLoss
 from network import build_model, ResNet50Mod
 from utils import deep_cluster, prepare_for_train, update_labels
-from save_mat import Save_mat
 
 
 def train_epoch(args, dataloaders, net, criteria, optimizer, epoch):
@@ -133,7 +132,7 @@ def train_val(args, train_loader, query_loader, dbase_loader):
 
         # we monitor mAP@topk validation accuracy every 5 epochs
         # and use early stopping patience of 10 to get the best params of models
-        if (epoch + 1) % 1 == 0 or (epoch + 1) == args.n_epochs:
+        if (epoch + 1) %  1== 0 or (epoch + 1) == args.n_epochs:
             qB, qL = prediction(net, query_loader, out_idx)
             rB, rL = prediction(net, dbase_loader, out_idx)
             map_v = mean_average_precision(qB, rB, qL, rL, args.topk)
@@ -148,13 +147,6 @@ def train_val(args, train_loader, query_loader, dbase_loader):
                 best_epoch = epoch
                 best_checkpoint = deepcopy(net.state_dict())
                 count = 0
-                Save_mat(epoch=epoch, output_dim=args.n_bits, datasets=args.dataset,
-                         query_labels=qL,
-                         retrieval_labels=rL,
-                         query_img=qB,
-                         retrieval_img=rB,
-                         save_dir='.',
-                         mode_name="resnet50", map=map_v)
             # del qB, qL, rB, rL
                 # print(f'Precision Recall Curve data:\n"DSH":[{P},{R}],')
                 # f.write('PR | Epoch %d | ' % (epoch))
@@ -196,12 +188,12 @@ def prepare_loaders(args, bl_func):
 
 
 def main():
-    init("0")
+    init("1")
     args = get_config()
 
     dummy_logger_id = None
     rst = []
-    for dataset in [ "coco", "flickr"]:
+    for dataset in ["flickr", "cifar","coco"]:
         print(f"processing dataset: {dataset}")
         args.dataset = dataset
         args.n_classes = get_class_num(dataset)
@@ -209,7 +201,7 @@ def main():
 
         train_loader, query_loader, dbase_loader = prepare_loaders(args, build_loader)
 
-        for hash_bit in [16]:
+        for hash_bit in [16,32,64,128]:
         # for hash_bit in [32]:
             random_seed()
             print(f"processing hash-bit: {hash_bit}")
@@ -234,7 +226,7 @@ def main():
             rst.append({"dataset": dataset, "hash_bit": hash_bit, "best_epoch": best_epoch, "best_map": best_map})
     for x in rst:
         print(
-            f"[dataset:{x['dataset']}][bits:{x['hash_bit']}][best-epoch:{x['best_epoch']}][best-mAP:{x['best_map']:.3f}]"
+            f"[dataset:{x['dataset']}][bits:{x['hash_bit']}][best-epoch:{x['best_epoch']}][best-mAP:{x['best_map']:.4f}]"
         )
 
 
