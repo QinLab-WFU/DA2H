@@ -13,7 +13,7 @@ def get_config():
     parser.add_argument("--optimizer", type=str, default="adam", help="adam/rmsprop/adamw/sgd")
     parser.add_argument("--lr", type=float, default=1e-5, help="learning rate")
     parser.add_argument("--weight_decay", type=float, default=4e-4, help="weight decay")
-    parser.add_argument("--data_dir", type=str, default="/root/autodl-tmp/Dataset",
+    parser.add_argument("--data_dir", type=str, default="/home/virtue/singlemodal/Dataset",
                         help="directory to dataset")
     parser.add_argument("--save_dir", type=str, default="./output", help="directory to output results")
     parser.add_argument("--n_classes", type=int, default=10, help="number of dataset classes")
@@ -60,11 +60,11 @@ def get_config():
 
     ### Interclass Mining: Parameters
     parser.add_argument(
-        "--n_clusters", default=20, type=int, help="Number of clusters for auxiliary inter-class mining task."
+        "--n_clusters", default=140, type=int, help="Number of clusters for auxiliary inter-class mining task."
     )
     parser.add_argument(
         "--cluster_update_freq",
-        default=3,
+        default=6,
         type=int,
         help="Number of epochs to train before updating cluster labels. E.g. 1 -> every other epoch.",
     )
@@ -103,7 +103,7 @@ def get_config():
     parser.add_argument(
         "--margin",
         type=float,
-        default=[0.2, 0.2],
+        default=[0.3, 0.3],
         nargs="+",
         help="TRIPLETS: Fixed Margin value for Triplet-based loss functions for [main task, aux. task].",
     )
